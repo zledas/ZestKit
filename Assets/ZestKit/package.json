@@ -1,0 +1,7 @@
+{
+    "name": "com.tagofjoy.zestkit",
+    "displayName": "ZestKit",
+    "version": "2020.2.3",
+    "unity": "2018.3",
+    "description": "Tween library for Unity. The best of GoKit and GoKitLite combined in an easy to use API. Originally developed by prime31, package build by zledas."
+}
