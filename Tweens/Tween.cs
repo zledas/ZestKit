@@ -33,6 +33,7 @@ namespace Prime31.ZestKit
 		protected bool _shouldRecycleTween = true;
 		protected bool _isRelative;
 		protected Action<ITween<T>> _completionHandler;
+		protected Action<ITween<T>> _tickHandler;
 		protected Action<ITween<T>> _loopCompleteHandler;
 		protected ITweenable _nextTween;
 
@@ -105,7 +106,12 @@ namespace Prime31.ZestKit
 			_completionHandler = completionHandler;
 			return this;
 		}
-		
+
+		public ITween<T> setTickHandler( Action<ITween<T>> tickHandler )
+		{
+			_tickHandler = tickHandler;
+			return this;
+		}
 
 		public ITween<T> setLoops( LoopType loopType, int loops = 1, float delayBetweenLoops = 0f )
 		{
@@ -132,6 +138,16 @@ namespace Prime31.ZestKit
 		{
 			_isFromValueOverridden = true;
 			_fromValue = from;
+			return this;
+		}
+
+
+		public ITween<T> setTo( T to )
+		{
+			_toValue = to;
+			if (_isRelative) {
+				this.setIsRelative();
+			}
 			return this;
 		}
 
@@ -209,6 +225,9 @@ namespace Prime31.ZestKit
 				_elapsedTime -= deltaTime;
 			else
 				_elapsedTime += deltaTime;
+
+			if( _tickHandler != null )
+				_tickHandler( this );
 
 			if( _tweenState == TweenState.Complete )
 			{
@@ -337,7 +356,7 @@ namespace Prime31.ZestKit
 		void resetState()
 		{
 			context = null;
-			_completionHandler = _loopCompleteHandler = null;
+			_completionHandler = _tickHandler = _loopCompleteHandler = null;
 			_isFromValueOverridden = false;
 			_isTimeScaleIndependent = false;
 			_tweenState = TweenState.Complete;
