@@ -15,6 +15,7 @@ namespace Prime31.ZestKit
 		List<ITweenable> _tweenList = new List<ITweenable>();
 		int _currentTween = 0;
 		Action<TweenChain> _completionHandler;
+		Action<TweenChain> _tickHandler;
 
 		public int totalTweens { get { return _tweenList.Count; } }
 
@@ -45,6 +46,8 @@ namespace Prime31.ZestKit
 				_currentTween++;
 				if( _currentTween == _tweenList.Count )
 				{
+					if( _tickHandler != null )
+						_tickHandler( this );
 					if( _completionHandler != null )
 						_completionHandler( this );
 
@@ -57,6 +60,9 @@ namespace Prime31.ZestKit
 					_tweenList[_currentTween].start();
 				}
 			}
+
+			if( _tickHandler != null )
+				_tickHandler( this );
 
 			return false;
 		}
@@ -122,6 +128,12 @@ namespace Prime31.ZestKit
 		public TweenChain setCompletionHandler( Action<TweenChain> completionHandler )
 		{
 			_completionHandler = completionHandler;
+			return this;
+		}
+
+		public TweenChain setTickHandler( Action<TweenChain> tickHandler )
+		{
+			_tickHandler = tickHandler;
 			return this;
 		}
 

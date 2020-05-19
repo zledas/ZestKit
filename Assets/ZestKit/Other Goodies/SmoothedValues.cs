@@ -23,24 +23,49 @@ namespace Prime31.ZestKit
 		protected T _fromValue;
 		protected T _toValue;
 
+		protected bool _isTimeScaleIndependent;
+
+		protected bool _finalValueReturned;
+		public bool finalValueReturned {
+			get {
+				return _finalValueReturned;
+			}
+		}
 
 		public abstract T value { get; }
 
 
-		public SmoothedValue( T currentValue, float duration = 0.3f )
+		public SmoothedValue( T currentValue, float duration = 0.3f, bool isTimeScaleIndependent = false)
 		{
+			_isTimeScaleIndependent = isTimeScaleIndependent;
 			_duration = duration;
-			_startTime = Time.time;
+			_startTime = (_isTimeScaleIndependent ? Time.unscaledTime : Time.time);
+			_finalValueReturned = false;
 
 			_currentValue = currentValue;
 			_fromValue = currentValue;
 			_toValue = currentValue;
 		}
 
+		public SmoothedValue( T currentValue, EaseType easeType, float duration = 0.3f, bool isTimeScaleIndependent = false ): this(currentValue, duration, isTimeScaleIndependent)
+		{
+			this.easeType = easeType;
+		}
+
 
 		public void setToValue( T toValue )
 		{
-			_startTime = Time.time;
+			_startTime = (_isTimeScaleIndependent ? Time.unscaledTime : Time.time);
+			_finalValueReturned = false;
+			_fromValue = _currentValue;
+			_toValue = toValue;
+		}
+
+		public void setToValue( T toValue, float duration )
+		{
+			_duration = duration;
+			_startTime = (_isTimeScaleIndependent ? Time.unscaledTime : Time.time);
+			_finalValueReturned = false;
 			_fromValue = _currentValue;
 			_toValue = toValue;
 		}
@@ -48,7 +73,17 @@ namespace Prime31.ZestKit
 
 		public void resetFromAndToValues( T fromValue, T toValue )
 		{
-			_startTime = Time.time;
+			_startTime = (_isTimeScaleIndependent ? Time.unscaledTime : Time.time);
+			_finalValueReturned = false;
+			_fromValue = fromValue;
+			_toValue = toValue;
+		}
+
+		public void resetFromAndToValues( T fromValue, T toValue, float duration )
+		{
+			_duration = duration;
+			_startTime = (_isTimeScaleIndependent ? Time.unscaledTime : Time.time);
+			_finalValueReturned = false;
 			_fromValue = fromValue;
 			_toValue = toValue;
 		}
@@ -57,20 +92,25 @@ namespace Prime31.ZestKit
 
 	public class SmoothedFloat : SmoothedValue<float>
 	{
-		public SmoothedFloat( float currentValue, float duration = 0.3f ) : base( currentValue, duration )
+		public SmoothedFloat( float currentValue, float duration = 0.3f, bool isTimeScaleIndependent = false ) : base( currentValue, duration, isTimeScaleIndependent )
 		{}
 
+		public SmoothedFloat( float currentValue, EaseType easeType, float duration = 0.3f, bool isTimeScaleIndependent = false ) : base( currentValue, easeType, duration, isTimeScaleIndependent )
+		{}
 
 		public override float value
 		{
 			get
 			{
 				// skip the calculation if we are already at our target
-				if( _currentValue == _toValue )
+				if( _finalValueReturned )
 					return _currentValue;
 
 				// how far along are we?
-				var elapsedTime = Mathf.Clamp( Time.time - _startTime, 0f, _duration );
+				var elapsedTime = Mathf.Clamp( (_isTimeScaleIndependent ? Time.unscaledTime : Time.time) - _startTime, 0f, _duration );
+				if (elapsedTime == _duration) {
+					_finalValueReturned = true;
+				}
 				_currentValue = Zest.ease( easeType, _fromValue, _toValue, elapsedTime, _duration );
 
 				return _currentValue;
@@ -81,20 +121,25 @@ namespace Prime31.ZestKit
 
 	public class SmoothedVector2 : SmoothedValue<Vector2>
 	{
-		public SmoothedVector2( Vector2 currentValue, float duration = 0.3f ) : base( currentValue, duration )
+		public SmoothedVector2( Vector2 currentValue, float duration = 0.3f, bool isTimeScaleIndependent = false ) : base( currentValue, duration, isTimeScaleIndependent )
 		{}
 
+		public SmoothedVector2( Vector2 currentValue, EaseType easeType, float duration = 0.3f, bool isTimeScaleIndependent = false ) : base( currentValue, easeType, duration, isTimeScaleIndependent )
+		{}
 
 		public override Vector2 value
 		{
 			get
 			{
 				// skip the calculation if we are already at our target
-				if( _currentValue == _toValue )
+				if( _finalValueReturned )
 					return _currentValue;
 
 				// how far along are we?
-				var elapsedTime = Mathf.Clamp( Time.time - _startTime, 0f, _duration );
+				var elapsedTime = Mathf.Clamp( (_isTimeScaleIndependent ? Time.unscaledTime : Time.time) - _startTime, 0f, _duration );
+				if (elapsedTime == _duration) {
+					_finalValueReturned = true;
+				}
 				_currentValue = Zest.ease( easeType, _fromValue, _toValue, elapsedTime, _duration );
 
 				return _currentValue;
@@ -105,20 +150,25 @@ namespace Prime31.ZestKit
 
 	public class SmoothedVector3 : SmoothedValue<Vector3>
 	{
-		public SmoothedVector3( Vector3 currentValue, float duration = 0.3f ) : base( currentValue, duration )
+		public SmoothedVector3( Vector3 currentValue, float duration = 0.3f, bool isTimeScaleIndependent = false ) : base( currentValue, duration, isTimeScaleIndependent )
 		{}
 
+		public SmoothedVector3( Vector3 currentValue, EaseType easeType, float duration = 0.3f, bool isTimeScaleIndependent = false ) : base( currentValue, easeType, duration, isTimeScaleIndependent )
+		{}
 
 		public override Vector3 value
 		{
 			get
 			{
 				// skip the calculation if we are already at our target
-				if( _currentValue == _toValue )
+				if( _finalValueReturned )
 					return _currentValue;
 
 				// how far along are we?
-				var elapsedTime = Mathf.Clamp( Time.time - _startTime, 0f, _duration );
+				var elapsedTime = Mathf.Clamp( (_isTimeScaleIndependent ? Time.unscaledTime : Time.time) - _startTime, 0f, _duration );
+				if (elapsedTime == _duration) {
+					_finalValueReturned = true;
+				}
 				_currentValue = Zest.ease( easeType, _fromValue, _toValue, elapsedTime, _duration );
 
 				return _currentValue;

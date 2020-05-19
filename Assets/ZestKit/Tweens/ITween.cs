@@ -58,6 +58,11 @@ namespace Prime31.ZestKit
 		ITween<T> setCompletionHandler( Action<ITween<T>> completionHandler );
 
 		/// <summary>
+		/// chainable. sets the action that should be called when the tween is ticked while active and not finished.
+		/// </summary>
+		ITween<T> setTickHandler( Action<ITween<T>> tickHandler );
+
+		/// <summary>
 		/// chainable. set the loop type for the tween. a single pingpong loop means going from start-finish-start.
 		/// </summary>
 		ITween<T> setLoops( LoopType loopType, int loops = 1, float delayBetweenLoops = 0f );
@@ -70,12 +75,22 @@ namespace Prime31.ZestKit
 		/// </summary>
 		ITween<T> setLoopCompletionHandler( Action<ITween<T>> loopCompleteHandler );
 
+
 		/// <summary>
 		/// sets the start position for the tween
 		/// </summary>
 		/// <returns>The from.</returns>
 		/// <param name="from">From.</param>
 		ITween<T> setFrom( T from );
+
+
+		/// <summary>
+		/// sets the end position for the tween. use this with caution! when changing this, values change not according to EaseType curve!
+		/// </summary>
+		/// <returns>The to.</returns>
+		/// <param name="from">To.</param>
+		ITween<T> setTo( T to );
+
 
 		/// <summary>
 		/// prepares a tween for reuse by resetting its from/to values and duration
